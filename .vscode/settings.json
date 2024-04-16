@@ -1,0 +1,12 @@
+{
+  "workbench.colorCustomizations": {
+    "editor.selectionBackground": "#007acc41",
+    "editorGutter.addedBackground": "#A0A0A0",
+    "editorGutter.deletedBackground": "#A0A0A0",
+    "editorGutter.modifiedBackground": "#A0A0A0",
+    "tab.activeBorderTop": "#ff6767",
+    "tab.activeBorder": "#ff6767",
+    "minimap.background": "#00000000",
+    "scrollbar.shadow": "#00000000"
+  }
+}
