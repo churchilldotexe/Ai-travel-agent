@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 
 import { Inter } from "next/font/google";
+import type { ReactElement } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,13 +14,9 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }): ReactElement {
   return (
-    <html lang="en">
+    <html lang="en" className="box-border bg-slate-50">
       <body className={`font-sans ${inter.variable}`}>{children}</body>
     </html>
   );
