@@ -23,7 +23,7 @@ const config = {
       parserOptions: {
         project: path.join(__dirname, "./tsconfig.json"),
       },
-      plugins: ["@typescript-eslint", "eslint-plugin-react"],
+      plugins: ["@typescript-eslint", "eslint-plugin-react", "react"],
       extends: [
         "plugin:@next/next/recommended",
         "plugin:@typescript-eslint/recommended-type-checked",
