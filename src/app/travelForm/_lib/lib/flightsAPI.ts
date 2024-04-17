@@ -9,7 +9,7 @@ const options = {
   method: "GET",
   headers: {
     "X-RapidAPI-Key": env.X_RAPIDAPI_KEY,
-    "X-RapidAPI-Host": env.X_RAPIDAPI_HOST,
+    "X-RapidAPI-Host": "booking-com18.p.rapidapi.com",
   },
 };
 
