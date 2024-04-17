@@ -10,7 +10,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]),
     OPENWEATHER_API_KEY: z.string(),
     X_RAPIDAPI_KEY: z.string(),
-    X_RAPIDAPI_HOST: z.string().url(),
+    X_RAPIDAPI_HOST: z.string(),
   },
 
   /**
