@@ -16,7 +16,7 @@ export default function LinkComponent({
   className,
   children,
 }: LinkProps): ReactElement {
-  const linkHref = Boolean(params) ? `${route}?${params}` : route;
+  const linkHref = params !== undefined ? `${route}?${params}` : route;
   return (
     <Link href={linkHref} className={className}>
       {children}

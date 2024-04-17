@@ -14,6 +14,10 @@ const config = {
       },
     },
     {
+      env: {
+        browser: true,
+        node: true,
+      },
       files: ["*.ts", "*.tsx"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
@@ -27,6 +31,7 @@ const config = {
         "plugin:tailwindcss/recommended",
         "plugin:react/recommended",
         "plugin:@next/next/recommended",
+        "eslint:recommended",
       ],
       rules: {
         "no-restricted-imports": "off",

@@ -1,24 +1,57 @@
 "use client";
 
+import { onSubmitAction } from "@/app/travelForm/_lib/actions";
 import InputWithLabel from "@/app/travelForm/_lib/components/InputWithLabel";
+import { formSchema } from "@/app/travelForm/_lib/lib/formSchema";
 import Main from "@/components/Main";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus } from "lucide-react";
-import { useState, type ReactElement } from "react";
+import { useRef, useState, type ReactElement } from "react";
+import { useFormState, useFormStatus } from "react-dom";
+import { useForm } from "react-hook-form";
+import { type z } from "zod";
+
+function Button(): ReactElement {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      className="w-full rounded-full border-4 border-slate-950 bg-emerald-400 py-2 text-center text-2xl font-bold transition-all hover:scale-105 focus-visible:scale-105 active:scale-95"
+      disabled={pending}
+    >
+      {pending ? "loading" : "Plan my Trip"}
+    </button>
+  );
+}
 
 export default function travelFormPage(): ReactElement {
-  const [travelersCount, setTravelersCount] = useState<number>(0);
+  const [_, formAction] = useFormState(onSubmitAction, { message: "" });
+  const [travelersCount, setTravelersCount] = useState<number>(1);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<z.output<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      count: 1,
+      origin: "",
+      destination: "",
+      budget: 100,
+    },
+  });
 
   const handleMinus = (): void => {
     setTravelersCount((prevCount) => {
-      if (prevCount === 0) {
-        return (prevCount = 0);
+      if (prevCount === 1) {
+        return (prevCount = 1);
       } else {
         return prevCount - 1;
       }
     });
   };
-
-  console.log("rendered");
 
   const handleSum = (): void => {
     setTravelersCount((prevCount) => prevCount + 1);
@@ -26,16 +59,13 @@ export default function travelFormPage(): ReactElement {
 
   return (
     <Main>
-      <form action="" className="">
-        <div className="relative">
-          <InputWithLabel
-            type="number"
-            min={0}
-            placeholder="1"
-            value={travelersCount}
-            name="count"
-            readOnly
-          >
+      <form
+        ref={formRef}
+        action={formAction}
+        onSubmit={handleSubmit(() => formRef.current?.submit())}
+      >
+        <div className="relative ">
+          <InputWithLabel type="number" value={travelersCount} readOnly {...register("count")}>
             Number of travelers
           </InputWithLabel>
 
@@ -56,36 +86,51 @@ export default function travelFormPage(): ReactElement {
             <span className="sr-only">minus</span>
           </button>
         </div>
+        {Boolean(errors.count) && (
+          <div className="text-center font-semibold text-red-600">{errors.count?.message}</div>
+        )}
 
         <div className="mt-12 space-y-2">
-          <InputWithLabel name="origin" type="text" placeholder="New York City">
+          <InputWithLabel type="text" placeholder="New York City" {...register("origin")}>
             Flying from
           </InputWithLabel>
+          {Boolean(errors.origin) && (
+            <div className="text-center font-semibold text-red-600">{errors.origin?.message}</div>
+          )}
 
-          <InputWithLabel name="destination" type="text" placeholder="Paris">
+          <InputWithLabel type="text" placeholder="Paris" {...register("destination")}>
             Flying to
           </InputWithLabel>
+          {Boolean(errors.destination) && (
+            <div className="text-center font-semibold text-red-600">
+              {errors.destination?.message}
+            </div>
+          )}
         </div>
 
         <div className="mt-12 space-y-2">
-          <InputWithLabel className="w-full" type="date" name="flightDate">
+          <InputWithLabel className="w-full" type="date" {...register("flightDate")}>
             From Date
           </InputWithLabel>
+          {Boolean(errors.flightDate) && (
+            <div className="text-center font-semibold text-red-600">
+              {errors.flightDate?.message}
+            </div>
+          )}
 
-          <InputWithLabel className="w-full" type="date" name="returnDate">
+          <InputWithLabel className="w-full" type="date" {...register("returnDate")}>
             To Date
           </InputWithLabel>
+          {Boolean(errors.returnDate) && (
+            <div className="text-center font-semibold text-red-600">
+              {errors.returnDate?.message}
+            </div>
+          )}
         </div>
 
         <div className="mt-9 space-y-4">
           <div className="relative">
-            <InputWithLabel
-              className="overflow-x-auto"
-              name="budget"
-              type="number"
-              placeholder="5000"
-              max={10000000000}
-            >
+            <InputWithLabel type="number" placeholder="5000" {...register("budget")}>
               Budget
             </InputWithLabel>
 
@@ -93,13 +138,11 @@ export default function travelFormPage(): ReactElement {
               $
             </div>
           </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-full border-4 border-slate-950 bg-emerald-400 py-2 text-center text-2xl font-bold transition-all hover:scale-105 focus-visible:scale-105 active:scale-95"
-          >
-            Plan my Trip
-          </button>
+          {Boolean(errors.budget) && (
+            <div className="text-center font-semibold text-red-600">{errors.budget?.message}</div>
+          )}
+          {isSubmitting && <div>loading</div>}
+          <Button />
         </div>
       </form>
     </Main>

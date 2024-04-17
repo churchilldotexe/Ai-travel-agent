@@ -1,9 +1,9 @@
-import { cn } from "@/utils";
-import { type DetailedHTMLProps, type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
+import type { ReactElement, DetailedHTMLProps, HTMLAttributes } from "react";
 
 type MainProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
 
-export default function Main({ children, className, ...props }: MainProps) {
+export default function Main({ children, className, ...props }: MainProps): ReactElement {
   return (
     <main
       className={cn(
