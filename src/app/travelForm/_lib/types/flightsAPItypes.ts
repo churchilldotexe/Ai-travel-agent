@@ -1439,7 +1439,9 @@ const {
   marketingCarriers: [airline],
 } = flightsSample.data.resultSetMetaData;
 const [route] = flightsSample.data.routes;
-const flightsReturn = { priceRange, travelTimeRange, airline, route };
+const currency = flightsSample.data.quickSortPrices.recommendation.currency;
+
+const flightsReturn = { priceRange, travelTimeRange, airline, route, currency };
 
 export type FlightInfo = typeof flightInfoSample;
 export type FlightTypes = typeof flightsSample;

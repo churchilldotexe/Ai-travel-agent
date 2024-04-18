@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import type { ReactElement, ReactNode } from "react";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,7 +18,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }): ReactElement {
   return (
     <html lang="en" className="box-border bg-slate-50">
-      <body className={`font-sans ${inter.variable}`}>{children}</body>
+      <body className={`font-sans ${inter.variable}`}>
+        <Toaster closeButton position="top-center" richColors />
+        {children}
+      </body>
     </html>
   );
 }

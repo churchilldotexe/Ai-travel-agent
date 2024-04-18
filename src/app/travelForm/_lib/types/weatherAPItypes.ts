@@ -1,33 +1,58 @@
-const openWeatherResponse = {
-  coord: { lon: -74.006, lat: 40.7127 },
-  weather: [{ id: 800, main: "Clear", description: "clear sky", icon: "01d" }],
-  base: "stations",
-  main: {
-    temp: 287.39,
-    feels_like: 286.25,
-    temp_min: 284.79,
-    temp_max: 289.83,
-    pressure: 1023,
-    humidity: 53,
-  },
-  visibility: 10000,
-  wind: { speed: 5.66, deg: 50 },
-  clouds: { all: 0 },
-  dt: 1713361234,
-  sys: {
-    type: 2,
-    id: 2008101,
-    country: "US",
-    sunrise: 1713348797,
-    sunset: 1713397033,
-  },
-  timezone: -14400,
-  id: 5128581,
-  name: "New York",
-  cod: 200,
-};
+import { z } from "zod";
 
-export type weatherTypes = typeof openWeatherResponse;
+const WeatherSchema = z.object({
+  id: z.number(),
+  main: z.string(),
+  description: z.string(),
+  icon: z.string(),
+});
+
+const MainSchema = z.object({
+  temp: z.number(),
+  feels_like: z.number(),
+  temp_min: z.number(),
+  temp_max: z.number(),
+  pressure: z.number(),
+  humidity: z.number(),
+});
+
+const WindSchema = z.object({
+  speed: z.number(),
+  deg: z.number(),
+});
+
+const CloudsSchema = z.object({
+  all: z.number(),
+});
+
+const SysSchema = z.object({
+  type: z.number(),
+  id: z.number(),
+  country: z.string(),
+  sunrise: z.number(),
+  sunset: z.number(),
+});
+
+export const OpenWeatherResponseSchema = z.object({
+  coord: z.object({
+    lon: z.number(),
+    lat: z.number(),
+  }),
+  weather: z.array(WeatherSchema),
+  base: z.string(),
+  main: MainSchema,
+  visibility: z.number(),
+  wind: WindSchema,
+  clouds: CloudsSchema,
+  dt: z.number(),
+  sys: SysSchema,
+  timezone: z.number(),
+  id: z.number(),
+  name: z.string(),
+  cod: z.number(),
+});
+
+export type weatherTypes = z.infer<typeof OpenWeatherResponseSchema>;
 
 export type getLocationTypes = {
   lat: number;

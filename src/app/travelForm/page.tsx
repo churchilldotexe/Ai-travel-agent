@@ -7,39 +7,41 @@ import Main from "@/components/Main";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus } from "lucide-react";
 import { useRef, useState, type ReactElement } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { type z } from "zod";
 
-function Button(): ReactElement {
-  const { pending } = useFormStatus();
+function Button({ isLoading }: { isLoading: boolean }): ReactElement {
   return (
     <button
       type="submit"
       className="w-full rounded-full border-4 border-slate-950 bg-emerald-400 py-2 text-center text-2xl font-bold transition-all hover:scale-105 focus-visible:scale-105 active:scale-95"
-      disabled={pending}
+      disabled={isLoading}
     >
-      {pending ? "loading" : "Plan my Trip"}
+      {isLoading ? "loading" : "Plan my Trip"}
     </button>
   );
 }
 
 export default function travelFormPage(): ReactElement {
-  const [_, formAction] = useFormState(onSubmitAction, { message: "" });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [state, formAction] = useFormState(onSubmitAction, { message: "" });
   const [travelersCount, setTravelersCount] = useState<number>(1);
   const formRef = useRef<HTMLFormElement>(null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       count: 1,
       origin: "",
       destination: "",
-      budget: 100,
+      budget: 500,
+      ...(state?.fields ?? {}),
     },
   });
 
@@ -57,12 +59,24 @@ export default function travelFormPage(): ReactElement {
     setTravelersCount((prevCount) => prevCount + 1);
   };
 
+  if (state.message === "success") {
+    setIsLoading(false);
+  } else if (state.error !== undefined) {
+    toast.error(state.error);
+  } else if (isLoading) {
+    toast.success("Getting your flight and hotel. Please wait");
+    <div className="fixed inset-0 z-10 m-auto size-fit">LOADING</div>;
+  }
+
   return (
     <Main>
       <form
         ref={formRef}
         action={formAction}
-        onSubmit={handleSubmit(() => formRef.current?.submit())}
+        onSubmit={handleSubmit(() => {
+          setIsLoading(true);
+          return formRef.current?.submit();
+        })}
       >
         <div className="relative ">
           <InputWithLabel type="number" value={travelersCount} readOnly {...register("count")}>
@@ -141,8 +155,7 @@ export default function travelFormPage(): ReactElement {
           {Boolean(errors.budget) && (
             <div className="text-center font-semibold text-red-600">{errors.budget?.message}</div>
           )}
-          {isSubmitting && <div>loading</div>}
-          <Button />
+          <Button isLoading={isLoading} />
         </div>
       </form>
     </Main>

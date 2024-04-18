@@ -11,7 +11,6 @@ export default function HomePage(): ReactElement {
       </div>
       <Link
         route="/travelForm"
-        params="id"
         className="w-3/4 rounded-full border-4 border-slate-950 bg-teal-400 py-5 text-center text-2xl font-bold text-slate-950 transition-all hover:scale-105 focus-visible:scale-105 active:scale-95 md:text-3xl lg:text-4xl"
       >
         Let&apos;s Begin

@@ -10,6 +10,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]),
     OPENWEATHER_API_KEY: z.string(),
     X_RAPIDAPI_KEY: z.string(),
+    OPENAI_API_KEY: z.string(),
   },
 
   /**
@@ -30,6 +31,7 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
     OPENWEATHER_API_KEY: process.env.OPENWEATHER_API_KEY,
     X_RAPIDAPI_KEY: process.env.X_RAPIDAPI_KEY,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

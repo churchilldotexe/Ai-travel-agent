@@ -13,56 +13,50 @@ const options = {
   },
 };
 
-export async function getHotelId({
-  budget,
-  checkinDate,
-  checkoutDate,
-  count,
-  locationId,
-}: {
-  locationId: string;
-  checkinDate: string;
-  checkoutDate: string;
-  count: number;
-  budget: number;
-}): Promise<HotelTypes> {
-  const url = `https://booking-com18.p.rapidapi.com/stays/search?locationId=${locationId}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&adults=${count}&maxPrice=${budget}&sortBy=popularity`;
+export async function getHotelId({ destination }: { destination: string }): Promise<string> {
+  const getIdUrl = `https://booking-com18.p.rapidapi.com/stays/auto-complete?query=${destination}`;
 
   try {
-    const response = await fetch(url, options);
-    if (!response.ok) throw { message: "Unable to get a Hotel" };
+    const response = await fetch(getIdUrl, options);
+    if (!response.ok)
+      throw new Error(`An error occurred while getting hotel id, ${response.statusText}`);
 
-    const result = (await response.json()) as HotelListTypes;
-    return result.data[0];
+    const result = (await response.json()) as HotelIdTypes;
+
+    if (result?.data[0] === undefined) throw new Error(`Unable to get hotel ID, ${result.message}`);
+
+    return result.data[0].id;
   } catch (error) {
     console.error(error);
-    throw { message: "An Error occured while getting a hotel" };
+    throw new Error("an error occurred while getting the hotel Id");
   }
 }
 
-export async function getHotel({
-  destination,
-  budget,
+export async function getHotelDetails({
   checkinDate,
   checkoutDate,
   count,
+  destination,
 }: {
   destination: string;
   checkinDate: string;
   checkoutDate: string;
   count: number;
-  budget: number;
-}): Promise<void> {
-  const getIdUrl = `https://booking-com18.p.rapidapi.com/stays/auto-complete?query=${destination}`;
+}): Promise<HotelTypes> {
+  const locationId = await getHotelId({ destination });
+
+  const url = `https://booking-com18.p.rapidapi.com/stays/search?locationId=${locationId}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&adults=${count}&sortBy=popularity`;
 
   try {
-    const getIdResponse = await fetch(getIdUrl, options);
-    const result = (await getIdResponse.json()) as HotelIdTypes;
-    if (result?.data[0] === undefined) throw { message: "unable to get hotel ID" };
-    const locationId = result.data[0].id;
-    await getHotelId({ budget, checkinDate, checkoutDate, count, locationId });
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`Unable to get a Hotel, Error:${response.statusText}`);
+
+    const result = (await response.json()) as HotelListTypes;
+
+    if (!result.status) throw new Error("Unable to get your Hotel ");
+    return result.data[0];
   } catch (error) {
     console.error(error);
-    throw { message: "an error occurred while getting the hotel Id" };
+    throw new Error("An Error occurred while getting a hotel");
   }
 }

@@ -18,24 +18,23 @@ export async function getFlightId(location: string): Promise<string> {
 
   try {
     const response = await fetch(url, options);
-    if (!response.ok) throw { message: "Unable to get flight information" };
+    if (!response.ok) throw new Error("Unable to get flight information");
     const result = (await response.json()) as FlightInfo;
 
-    if (result?.data[0] === undefined) throw { message: "Unable to get flight Data" };
+    if (result?.data[0] === undefined) throw new Error("Unable to get flight Data");
     return result.data[0].iataCode;
   } catch (error) {
     console.error(error);
-    throw { message: "An error occurred while getting flight information" };
+    throw new Error("An error occurred while getting flight information");
   }
 }
 
 export async function getFlight({
-  budget,
   count,
   departureDate,
+  returnDate,
   destination,
   origin,
-  returnDate,
 }: {
   origin: string;
   destination: string;
@@ -44,19 +43,16 @@ export async function getFlight({
   count: number;
   budget: number;
 }): Promise<FlightsReturnTypes> {
-  const fromId = await getFlightId(origin);
-  const toId = await getFlightId(destination);
-  const url = `https://booking-com18.p.rapidapi.com/flights/search-return?fromId=${fromId}&toId=${toId}&departureDate=${departureDate}&returnDate=${returnDate}&adults=${count}&priceRange=100,${budget}`;
-
   try {
-    const response = await fetch(url, options);
-    const result = (await response.json()) as FlightTypes;
+    const [fromId, toId] = await Promise.all([getFlightId(origin), getFlightId(destination)]);
 
-    if (
-      result?.data?.resultSetMetaData?.marketingCarriers[0] === undefined ||
-      result?.data?.routes[0] === undefined
-    )
-      throw { message: "Unable to get flights" };
+    const url = `https://booking-com18.p.rapidapi.com/flights/search-return?fromId=${fromId}&toId=${toId}&departureDate=${departureDate}&returnDate=${returnDate}&adults=${count}`;
+
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`An error occurred, ${response.statusText}`);
+
+    const result = (await response.json()) as FlightTypes;
+    if (!result.status) throw new Error(`An error Occurred while getting data from your flight.`);
 
     const {
       priceRange,
@@ -64,10 +60,13 @@ export async function getFlight({
       marketingCarriers: [airline],
     } = result.data.resultSetMetaData;
     const [route] = result.data.routes;
+    const currency = result.data.quickSortPrices.recommendation.currency;
 
-    return { priceRange, travelTimeRange, airline, route };
+    // const hotelDetails = await getHotelDetails({count,destination,departureDateISO:departureDate, returnDateISO:returnDate})
+
+    return { priceRange, travelTimeRange, airline, route, currency };
   } catch (error) {
     console.error(error);
-    throw { message: "An error Occurred while getting your flights" };
+    throw new Error("An error Occurred while getting your flights");
   }
 }
